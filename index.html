@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievement Rules - Mahi's Study Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ffffff;
+            --primary-dark: #f6f8fa;
+            --secondary: #2f81f7;
+            --accent: #6f42c1;
+            --text: #24292e;
+            --text-light: #6a737d;
+            --border: #e1e4e8;
+            --success: #28a745;
+            --card-shadow: 0 3px 6px rgba(0,0,0,0.05), 0 3px 6px rgba(0,0,0,0.05);
+            --hover-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 6px 6px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background-color: var(--primary-dark);
+            color: var(--text);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 25px;
+            background: var(--primary);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+        }
+        
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--secondary);
+            box-shadow: 0 0 15px rgba(47, 129, 247, 0.2);
+        }
+        
+        .profile-info h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+        
+        .profile-info p {
+            color: var(--text-light);
+        }
+        
+        .nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .nav-btn.active {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+        
+        .section {
+            position: relative;
+            border: 1px solid var(--border);
+            background: var(--primary);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            margin: 0 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .category-title {
+            font-size: 18px;
+            margin: 25px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .rule-card {
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .rule-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--secondary);
+        }
+        
+        .rule-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .rule-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 22px;
+            background: var(--primary);
+            border: 2px solid var(--border);
+            flex-shrink: 0;
+        }
+        
+        .gold-icon {
+            color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .rule-info {
+            flex-grow: 1;
+        }
+        
+        .rule-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+        
+        .rule-condition {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        
+        .rule-points {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(47, 129, 247, 0.1);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--secondary);
+            margin-top: 5px;
+            border: 1px solid var(--secondary);
+        }
+        
+        .rule-description {
+            font-size: 14px;
+            color: var(--text);
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .rank-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 5px;
+            margin: 20px 0;
+        }
+        
+        .rank-item {
+            flex: 0 0 auto;
+            width: 150px;
+            text-align: center;
+            padding: 15px 10px;
+            background: var(--primary);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+        }
+        
+        .rank-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .rank-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: var(--text);
+            font-weight: 600;
+        }
+        
+        .rank-range {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        .current-rank {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(47, 129, 247, 0.1);
+            background: var(--primary);
+        }
+        
+        .current-rank .rank-icon {
+            color: var(--secondary);
+        }
+        
+        /* Custom rank colors */
+        .rank-rookie { color: #aaa; }
+        .rank-bronze { color: #cd7f32; }
+        .rank-silver { color: #c0c0c0; }
+        .rank-gold { color: #ffcc00; }
+        .rank-platinum { color: #e5e4e2; }
+        .rank-diamond { color: #b9f2ff; }
+        .rank-crown { color: #ffd700; }
+        .rank-ace { color: #ff7700; }
+        .rank-conqueror { color: #ff0000; }
+        
+        .info-box {
+            background: rgba(47, 129, 247, 0.1);
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .rules-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav {
+                flex-wrap: wrap;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .profile {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="profile">
+                <img src="https://i.pinimg.com/1200x/e7/77/62/e7776294019563662fbbeb3f7cf95c5f.jpg" alt="Mahi's Profile Picture" class="profile-pic">
+                <div class="profile-info">
+                    <h1>Mahi's Study Tracker</h1>
+                    <p>Achievement Rules & Guidelines</p>
+                </div>
+            </div>
+        </header>
+        
+        <div class="nav">
+            <a href="achievements.html" class="nav-btn"><i class="fas fa-trophy"></i> My Achievements</a>
+            <a href="rules.html" class="nav-btn active"><i class="fas fa-book"></i> Rules & Guidelines</a>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-info-circle"></i>
+                <span>About the Achievement System</span>
+            </div>
+            
+            <p>This system tracks your study progress and rewards you with achievements as you reach milestones. Each achievement falls into one of several categories and contributes to your overall achievement points.</p>
+            
+            <div class="info-box">
+                <div class="info-title">How it works</div>
+                <p>As you study, the system automatically tracks your progress. When you meet the conditions for an achievement, it will be marked as completed in your profile. Your total achievement points determine your rank.</p>
+            </div>
+            
+            <div class="category-title">
+                <i class="fas fa-crown"></i>
+                <span>Ranks</span>
+            </div>
+            
+            <div class="rank-container">
+                <div class="rank-item current-rank">
+                    <div class="rank-icon">
+                        <i class="fas fa-chess-pawn rank-rookie"></i>
+                    </div>
+                    <div class="rank-name">Rookie</div>
+                    <div class="rank-range">0-200 points</div>
+                </div>
+                
+                <div class="rank-item">
+                    <div class="rank-icon">
+                        <i class="fas fa-shield-alt rank-bronze"></i>
+                    </div>
+                    <div class="rank-name">Bronze</div>
+                    <div class="rank-range">201-500 points</div>
+                </div>
+                
+                <div class="rank-item">
+                    <div class="rank-icon">
+                        <i class="fas fa-shield-alt rank-silver"></i>
+                    </div>
+                    <div class="rank-name">Silver</div>
+                    <div class="rank-range">501-1000 points</div>
+                </div>
+                
+                <div class="rank-item">
+                    <div class="rank-icon">
+                        <i class="fas fa-crown rank-gold"></i>
+                    </div>
+                    <div class="rank-name">Gold</div>
+                    <div class="rank-range">1001-2000 points</div>
+                </div>
+                
+                <div class="rank-item">
+                    <div class="rank-icon">
+                        <i class="fas fa-crown rank-platinum"></i>
+                    </div>
+                    <div class="rank-name">Platinum</div>
+                    <div class="rank-range">2001-4000 points</div>
+                </div>
+                
+                <div class="rank-item">
+                    <div class="rank-icon">
+                        <i class="fas fa-gem rank-diamond"></i>
+                    </div>
+                    <div class="rank-name">Diamond</div>
+                    <div class="rank-range">4001-6000 points</div>
+                </div>
+                
+                <div class="rank-item">
+                    <div class="rank-icon">
+                        <i class="fas fa-crown rank-crown"></i>
+                    </div>
+                    <div class="rank-name">Crown</div>
+                    <div class="rank-range">6001-10000 points</div>
+                </div>
+                
+                <div class="rank-item">
+                    <div class="rank-icon">
+                        <i class="fas fa-star rank-ace"></i>
+                    </div>
+                    <div class="rank-name">Ace</div>
+                    <div class="rank-range">10001-15000 points</div>
+                </div>
+                
+                <div class="rank-item">
+                    <div class="rank-icon">
+                        <i class="fas fa-trophy rank-conqueror"></i>
+                    </div>
+                    <div class="rank-name">Conqueror</div>
+                    <div class="rank-range">15001+ points</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-clock"></i>
+                <span>Time Medals</span>
+            </div>
+            <p>Earn these medals by accumulating total study hours over time.</p>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Bronze Clock I</div>
+                            <div class="rule-condition">5 total hours</div>
+                            <span class="rule-points">10 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Your first milestone! Study for 5 hours total to earn this badge.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Silver Clock I</div>
+                            <div class="rule-condition">20 total hours</div>
+                            <span class="rule-points">25 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Reach 20 hours of total study time to unlock this achievement.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Gold Clock I</div>
+                            <div class="rule-condition">50 total hours</div>
+                            <span class="rule-points">50 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        A significant milestone! Reach 50 hours of total study time.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Diamond Clock</div>
+                            <div class="rule-condition">250 total hours</div>
+                            <span class="rule-points">150 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Dedication pays off! Reach 250 hours of total study time.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Ace Clock</div>
+                            <div class="rule-condition">1000 total hours</div>
+                            <span class="rule-points">500 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        An exceptional achievement! Reach 1000 hours of total study time.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Conqueror Clock</div>
+                            <div class="rule-condition">2000 total hours</div>
+                            <span class="rule-points">1000 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        The ultimate time achievement! Reach 2000 hours of total study time.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-fire"></i>
+                <span>Streak Achievements</span>
+            </div>
+            <p>Earn these by maintaining consistent study habits day after day.</p>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Day Starter</div>
+                            <div class="rule-condition">1-day streak</div>
+                            <span class="rule-points">5 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Start your journey! Study for one day to begin your streak.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Weekly Warrior</div>
+                            <div class="rule-condition">7-day streak</div>
+                            <span class="rule-points">30 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Study every day for a full week to earn this achievement.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Monthly Master</div>
+                            <div class="rule-condition">30-day streak</div>
+                            <span class="rule-points">100 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Study every day for a full month to earn this prestigious badge.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Unbreakable</div>
+                            <div class="rule-condition">365-day streak</div>
+                            <span class="rule-points">500 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Study every day for a full year! This shows incredible dedication.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-brain"></i>
+                <span>Focus Achievements</span>
+            </div>
+            <p>These rewards are for maintaining focus during long study sessions.</p>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Focus Rookie</div>
+                            <div class="rule-condition">30 min session</div>
+                            <span class="rule-points">10 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Maintain focus for a continuous 30-minute study session.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Focus Master</div>
+                            <div class="rule-condition">2 hr session</div>
+                            <span class="rule-points">50 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Maintain intense focus for a continuous 2-hour study session.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Mind of Steel</div>
+                            <div class="rule-condition">8 hr session</div>
+                            <span class="rule-points">200 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        The ultimate focus challenge! Study for 8 continuous hours.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-tasks"></i>
+                <span>Study Challenges</span>
+            </div>
+            <p>Complete these special study challenges to earn extra rewards.</p>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Flash Study I</div>
+                            <div class="rule-condition">15 min session</div>
+                            <span class="rule-points">5 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Complete a quick 15-minute study session.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Focus Sprint</div>
+                            <div class="rule-condition">3 × 30-min sessions in a day</div>
+                            <span class="rule-points">25 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Complete three separate 30-minute study sessions in one day.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Deep Dive</div>
+                            <div class="rule-condition">10 hrs in one day</div>
+                            <span class="rule-points">150 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Marathon study session! Study for 10 hours in a single day.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Exam Mode Achievements</span>
+            </div>
+            <p>Special achievements for intensive study during exam periods.</p>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Exam Mode I</div>
+                            <div class="rule-condition">Study 2 hrs/day for 7 days before exam</div>
+                            <span class="rule-points">50 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Study at least 2 hours daily during the week before an exam.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Exam Week Warrior</div>
+                            <div class="rule-condition">Study 20 hrs in exam week</div>
+                            <span class="rule-points">100 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Dedicate 20 hours to studying during your exam week.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-star"></i>
+                <span>Special Event Medals</span>
+            </div>
+            <p>Earn these unique medals by studying during special occasions.</p>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Festival Medal</div>
+                            <div class="rule-condition">Study on a festival</div>
+                            <span class="rule-points">25 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Show dedication by studying during a festival or holiday.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Birthday Medal</div>
+                            <div class="rule-condition">Study on your birthday</div>
+                            <span class="rule-points">50 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Now that's commitment! Study on your special day.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Streak Saver Medal</div>
+                            <div class="rule-condition">Save a streak at last minute</div>
+                            <span class="rule-points">30 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Complete your study session just in time to maintain your streak.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <i class="fas fa-crown"></i>
+                <span>Legendary Achievements</span>
+            </div>
+            <p>The most prestigious achievements for truly dedicated learners.</p>
+            
+            <div class="rules-grid">
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Knowledge Master</div>
+                            <div class="rule-condition">500 total hours</div>
+                            <span class="rule-points">250 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Reach 500 total study hours to earn this prestigious title.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">The Scholar</div>
+                            <div class="rule-condition">365-day streak</div>
+                            <span class="rule-points">500 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        Study every day for a full year to earn this legendary status.
+                    </div>
+                </div>
+                
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <div class="rule-icon gold-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="rule-info">
+                            <div class="rule-name">Legend of Mahi</div>
+                            <div class="rule-condition">Unlock all achievements</div>
+                            <span class="rule-points">1000 pts</span>
+                        </div>
+                    </div>
+                    <div class="rule-description">
+                        The ultimate achievement! Complete every single achievement in the system.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple navigation active state
+        document.addEventListener('DOMContentLoaded', function() {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
